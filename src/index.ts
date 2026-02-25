@@ -1,6 +1,7 @@
 // src/index.ts
 import { Telegraf, Markup, Context } from 'telegraf';
 import * as dotenv from 'dotenv';
+import express from 'express';
 import { availableModels, defaultModelId, AIModel } from './config/models';
 import { initDatabase, createUser, getUser, updateUserModel, updateUserPersona, saveMessage } from './services/database';
 import { getPersonas, getPersonaById, DEFAULT_PERSONA_ID } from './services/personas';
@@ -8,6 +9,18 @@ import { askAI } from './services/ai';
 import { searchAndSummarize } from './services/search';
 
 dotenv.config();
+
+// --- EXPRESS SERVER (For Render/UptimeRobot) ---
+const app = express();
+const port = process.env.PORT || 3000;
+
+app.get('/', (req, res) => {
+  res.send('Bot is running! 🚀');
+});
+
+app.listen(port, () => {
+  console.log(`Web server is listening on port ${port}`);
+});
 
 const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN || '');
 
@@ -18,6 +31,48 @@ bot.use(async (ctx, next) => {
   }
   return next();
 });
+
+// --- YARDIMCI FONKSİYON: UZUN MESAJ GÖNDERME ---
+async function sendLongMessage(ctx: Context, text: string) {
+  if (!text) return;
+
+  const MAX_LENGTH = 4000; // Güvenlik payı ile 4000
+  
+  if (text.length <= MAX_LENGTH) {
+    try {
+      await ctx.reply(text, { parse_mode: 'HTML' });
+    } catch (e) {
+      // HTML hatası olursa düz metin gönder
+      await ctx.reply(text);
+    }
+    return;
+  }
+
+  // Parçalara böl
+  const chunks = [];
+  let currentChunk = "";
+
+  const paragraphs = text.split('\n'); // Paragraf paragraf böl
+
+  for (const para of paragraphs) {
+    if ((currentChunk + para).length < MAX_LENGTH) {
+      currentChunk += para + "\n";
+    } else {
+      chunks.push(currentChunk);
+      currentChunk = para + "\n";
+    }
+  }
+  if (currentChunk) chunks.push(currentChunk);
+
+  // Sırayla gönder
+  for (const chunk of chunks) {
+    try {
+      await ctx.reply(chunk, { parse_mode: 'HTML' });
+    } catch (e) {
+      await ctx.reply(chunk); // HTML bozuksa düz metin
+    }
+  }
+}
 
 // --- ANA MENÜ (/start) ---
 bot.start(async (ctx) => {
@@ -131,7 +186,7 @@ bot.command('search', async (ctx) => {
 
   try {
     const summary = await searchAndSummarize(query, userId, currentModelId);
-    ctx.reply(summary, { parse_mode: 'HTML' });
+    await sendLongMessage(ctx, summary); // Yeni fonksiyon
   } catch (error) {
     ctx.reply("⚠️ Hata oluştu.");
   }
@@ -151,7 +206,7 @@ bot.on('photo', async (ctx) => {
     const currentModelId = user ? user.current_model_id : defaultModelId;
     
     const response = await askAI(userId, currentModelId, caption, fileLink.href);
-    ctx.reply(response, { parse_mode: 'HTML' });
+    await sendLongMessage(ctx, response); // Yeni fonksiyon
   } catch (error) {
     ctx.reply("⚠️ Hata.");
   }
@@ -168,12 +223,7 @@ bot.on('text', async (ctx) => {
 
   try {
     const response = await askAI(userId, currentModelId, ctx.message.text);
-    if (response.length > 4000) {
-      const chunks = response.match(/.{1,4000}/g) || [];
-      for (const chunk of chunks) await ctx.reply(chunk, { parse_mode: 'HTML' });
-    } else {
-      await ctx.reply(response, { parse_mode: 'HTML' });
-    }
+    await sendLongMessage(ctx, response); // Yeni fonksiyon
   } catch (error) {
     ctx.reply("⚠️ Hata.");
   }
