@@ -5,5 +5,12 @@
     "model": "z-ai/glm-4.5-air:free",
     "userMessage": "selam",
     "botResponse": "Cevap yok."
+  },
+  {
+    "timestamp": "2026-02-27T03:24:12.117Z",
+    "userId": 5473144387,
+    "model": "arcee-ai/trinity-large-preview:free",
+    "userMessage": "selam",
+    "botResponse": "Merhaba! Nasıl yardımcı olabilirim?"
   }
 ]
