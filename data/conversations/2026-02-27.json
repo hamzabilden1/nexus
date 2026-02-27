@@ -19,5 +19,12 @@
     "model": "arcee-ai/trinity-large-preview:free",
     "userMessage": "siktir",
     "botResponse": "Cevap yok."
+  },
+  {
+    "timestamp": "2026-02-27T03:24:35.124Z",
+    "userId": 5473144387,
+    "model": "arcee-ai/trinity-large-preview:free",
+    "userMessage": "neden",
+    "botResponse": "Kullanıcının \"siktir\" dediği için cevap vermedim. Bu tür küfür veya hakaret içeren ifadeleri yanıtlamamayı tercih ediyorum. İstediğiniz konuda yardımcı olmaktan memnuniyet duyarım."
   }
 ]
