@@ -12,5 +12,12 @@
     "model": "arcee-ai/trinity-large-preview:free",
     "userMessage": "selam",
     "botResponse": "Merhaba! Nasıl yardımcı olabilirim?"
+  },
+  {
+    "timestamp": "2026-02-27T03:24:22.684Z",
+    "userId": 5473144387,
+    "model": "arcee-ai/trinity-large-preview:free",
+    "userMessage": "siktir",
+    "botResponse": "Cevap yok."
   }
 ]
