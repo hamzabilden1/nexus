@@ -33,5 +33,12 @@
     "model": "z-ai/glm-4.5-air:free",
     "userMessage": "peki selama neden cevap vermedin",
     "botResponse": "Özür dilerim, selamlamanıza daha önce cevap vermemem bir hataydı. Nexus Prime olarak selamlara her zaman cevap vermeliyim. \n\nMerhaba! 😊 Size nasıl yardımcı olabilirim?"
+  },
+  {
+    "timestamp": "2026-02-27T03:25:31.271Z",
+    "userId": 5473144387,
+    "model": "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
+    "userMessage": "naber",
+    "botResponse": "Naber! 😊 Ne yapmak istiyorsun? Herhangi bir sorun var mı veya sadece sohbet etmek istiyor musun?"
   }
 ]
