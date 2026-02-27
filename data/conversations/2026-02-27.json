@@ -1,0 +1,9 @@
+[
+  {
+    "timestamp": "2026-02-27T03:22:46.113Z",
+    "userId": 5473144387,
+    "model": "z-ai/glm-4.5-air:free",
+    "userMessage": "selam",
+    "botResponse": "Cevap yok."
+  }
+]
