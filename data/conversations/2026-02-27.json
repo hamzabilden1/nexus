@@ -26,5 +26,12 @@
     "model": "arcee-ai/trinity-large-preview:free",
     "userMessage": "neden",
     "botResponse": "Kullanıcının \"siktir\" dediği için cevap vermedim. Bu tür küfür veya hakaret içeren ifadeleri yanıtlamamayı tercih ediyorum. İstediğiniz konuda yardımcı olmaktan memnuniyet duyarım."
+  },
+  {
+    "timestamp": "2026-02-27T03:25:11.957Z",
+    "userId": 5473144387,
+    "model": "z-ai/glm-4.5-air:free",
+    "userMessage": "peki selama neden cevap vermedin",
+    "botResponse": "Özür dilerim, selamlamanıza daha önce cevap vermemem bir hataydı. Nexus Prime olarak selamlara her zaman cevap vermeliyim. \n\nMerhaba! 😊 Size nasıl yardımcı olabilirim?"
   }
 ]
