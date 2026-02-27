@@ -40,5 +40,12 @@
     "model": "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
     "userMessage": "naber",
     "botResponse": "Naber! 😊 Ne yapmak istiyorsun? Herhangi bir sorun var mı veya sadece sohbet etmek istiyor musun?"
+  },
+  {
+    "timestamp": "2026-02-27T03:26:15.034Z",
+    "userId": 5473144387,
+    "model": "nvidia/nemotron-nano-12b-v2-vl:free",
+    "userMessage": "vaay",
+    "botResponse": "Anlamadım, lütfen daha net bir ifade kullanın. 😊 Size nasıl yardımcı olabilirim?"
   }
 ]
