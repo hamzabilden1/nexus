@@ -1,6 +1,7 @@
 // src/services/database.ts
 import { createClient } from '@supabase/supabase-js';
 import { defaultModelId } from '../config/models';
+import { DEFAULT_PERSONA_ID } from './personas';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -28,9 +29,15 @@ export async function getUser(telegramId: number) {
 }
 
 export async function createUser(telegramId: number, username: string = '') {
+  // Sadece yeni kullanıcılar için varsayılan model ve personayı veritabanına ekle
   const { error } = await supabase
     .from('users')
-    .upsert({ telegram_id: telegramId, username }, { onConflict: 'telegram_id' });
+    .upsert({ 
+        telegram_id: telegramId, 
+        username,
+        current_model_id: defaultModelId,
+        current_persona_id: DEFAULT_PERSONA_ID
+    }, { onConflict: 'telegram_id', ignoreDuplicates: true });
   
   if (error) console.error('CreateUser Error:', error.message);
 }

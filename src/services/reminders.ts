@@ -3,7 +3,7 @@ import { Telegraf } from 'telegraf';
 import { getDueReminders, deleteKnowledge } from './database';
 
 export function startReminderService(bot: Telegraf) {
-  // Her 1 dakikada bir kontrol et
+  // Her 10 saniyede bir kontrol et (Daha hassas zamanlama için)
   setInterval(async () => {
     try {
       const now = Date.now();
@@ -19,9 +19,10 @@ export function startReminderService(bot: Telegraf) {
         
         // Gönderilen hatırlatıcıyı sil
         await deleteKnowledge(reminder.telegram_id, reminder.key);
+        console.log(`🔔 Reminder sent and deleted for user ${reminder.telegram_id}`);
       }
     } catch (e) {
       console.error("Reminder check error:", e);
     }
-  }, 60000);
+  }, 10000);
 }

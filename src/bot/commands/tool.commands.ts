@@ -55,11 +55,6 @@ export function setupToolCommands(bot: Telegraf) {
       ctx.reply(`📝 <b>"${title}"</b> isimli not başlatıldı.\n\nBundan sonra yazacağınız her mesaj bu nota eklenecektir.\nBitirmek ve kaydetmek için /notkapat yazın.`, { parse_mode: 'HTML' });
   });
 
-  bot.command('notkapat', async (ctx) => {
-      // Bu kısım message.handler.ts içerisinde text eventi tarafından yakalanacak ama komut olarak da burada kalsın
-      ctx.reply('Lütfen /notkapat komutunu not alırken kullanın.');
-  });
-
   bot.command('hatirlatici', async (ctx) => {
       reminderSessions.set(ctx.from.id, { step: 'AWAITING_TITLE' });
       await ctx.reply('⏰ <b>Yeni Hatırlatıcı</b>\n\nLütfen hatırlatıcının başlığını veya ne hatırlatmamı istediğinizi yazın:', { parse_mode: 'HTML' });
@@ -70,7 +65,7 @@ export function setupToolCommands(bot: Telegraf) {
           const key = ctx.message.text.replace('/getir', '').trim();
           if (!key) return ctx.reply('⚠️ Anahtar belirtmediniz. Örnek: /getir Başlık');
           const result = await getKnowledge(ctx.from.id, key);
-          if (result) await ctx.reply(`<b>${key}:</b>\n${result.value}`, { parse_mode: 'HTML' });
+          if (result) await ctx.reply(`<b>${key.replace(/</g, '&lt;').replace(/>/g, '&gt;')}:</b>\n${result.value.replace(/</g, '&lt;').replace(/>/g, '&gt;')}`, { parse_mode: 'HTML' });
           else await ctx.reply(`🚫 **${key}** adında bir not bulunamadı.`);
       } catch (error) {
           await ctx.reply("❌ Veri getirilirken bir hata oluştu.");
@@ -82,9 +77,10 @@ export function setupToolCommands(bot: Telegraf) {
           const notes = await listKnowledge(ctx.from.id);
           const filteredNotes = notes.filter(n => !n.key.startsWith('reminder:'));
           if (!filteredNotes || filteredNotes.length === 0) return ctx.reply('Hiç notunuz yok.');
-          const noteList = filteredNotes.map(n => `- <code>${n.key}</code>`).join('\n');
-          await ctx.reply(`<b>Kaydedilen Notlar:</b>\n${noteList}\n\nİçeriği görmek için /getir <başlık> yazabilirsiniz.`, { parse_mode: 'HTML' });
+          const noteList = filteredNotes.map(n => `- <code>${n.key.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code>`).join('\n');
+          await ctx.reply(`<b>Kaydedilen Notlar:</b>\n${noteList}\n\nİçeriği görmek için /getir &lt;başlık&gt; yazabilirsiniz.`, { parse_mode: 'HTML' });
       } catch (error) {
+          console.error("Notlarim Command Error:", error);
           await ctx.reply("❌ Notlar listelenirken bir hata oluştu.");
       }
   });

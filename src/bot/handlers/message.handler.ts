@@ -51,19 +51,47 @@ export function setupMessageHandlers(bot: Telegraf) {
           }
           
           if (session.step === 'AWAITING_TIME') {
-              // Parse date using chrono-node
-              let targetDate = chrono.parseDate(text);
+              let targetDate: Date | null = null;
               
-              // Fallback manual parser for DD.MM.YYYY HH:MM
+              // 1. Önce sadece saat formatını kontrol et (Örn: "15:30", "15.30", "15")
+              const timeMatch = text.trim().match(/^(\d{1,2})(?:[:.](\d{2}))?$/);
+              if (timeMatch) {
+                  const hours = parseInt(timeMatch[1], 10);
+                  const minutes = timeMatch[2] ? parseInt(timeMatch[2], 10) : 0;
+                  
+                  if (hours >= 0 && hours <= 23 && minutes >= 0 && minutes <= 59) {
+                      targetDate = new Date();
+                      targetDate.setHours(hours, minutes, 0, 0);
+                      
+                      // Eğer girilen saat geçmişte kalmışsa (şu an 14:00, girilen 11:00 ise) yarına kur.
+                      if (targetDate.getTime() < Date.now() - 60000) {
+                          targetDate.setDate(targetDate.getDate() + 1);
+                      }
+                  }
+              }
+              
+              // 2. Eğer sadece saat değilse, Türkçe tam tarih formatını kontrol et (Örn: 25.04.2026 15.30)
               if (!targetDate) {
-                  const match = text.match(/(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{1,2}):(\d{1,2})/);
-                  if (match) {
-                      targetDate = new Date(parseInt(match[3]), parseInt(match[2]) - 1, parseInt(match[1]), parseInt(match[4]), parseInt(match[5]));
+                  const fullDateMatch = text.match(/(\d{1,2})\.(\d{1,2})\.(\d{4})\s+(\d{1,2})[:.](\d{1,2})/);
+                  if (fullDateMatch) {
+                      targetDate = new Date(
+                          parseInt(fullDateMatch[3]), 
+                          parseInt(fullDateMatch[2]) - 1, 
+                          parseInt(fullDateMatch[1]), 
+                          parseInt(fullDateMatch[4]), 
+                          parseInt(fullDateMatch[5])
+                      );
                   }
               }
 
-              if (!targetDate || targetDate.getTime() < Date.now()) {
-                  return ctx.reply('⚠️ Tarih anlaşılamadı veya geçmiş bir tarih girdiniz. Lütfen "GG.AA.YYYY SS:DD" formatında girin (Örn: 25.04.2026 15:00) veya /iptal yazın.');
+              // 3. Hala bulamadıysa Chrono-node'a (İngilizce/Genel) bırak
+              if (!targetDate) {
+                  targetDate = chrono.parseDate(text);
+              }
+
+              // Doğrulama: Tarih algılanamadıysa veya (1 dakikalık toleransla) geçmişteyse hata ver
+              if (!targetDate || targetDate.getTime() < (Date.now() - 60000)) {
+                  return ctx.reply('⚠️ Tarih anlaşılamadı veya geçmiş bir tarih girdiniz. Lütfen "GG.AA.YYYY SS.DD" formatında girin (Örn: 25.04.2026 15.00) veya sadece saati yazın (Örn: 15.30). Çıkmak için /iptal yazın.');
               }
 
               await addReminder(userId, session.title!, targetDate.getTime());

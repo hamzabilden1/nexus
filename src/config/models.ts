@@ -28,8 +28,8 @@ export const availableModels: AIModel[] = [
   }
 ];
 
-// Varsayılan model: GLM 4.5 Air
-export const defaultModelId = "z-ai/glm-4.5-air:free";
+// Varsayılan model: Trinity Large Preview
+export const defaultModelId = "arcee-ai/trinity-large-preview:free";
 
 // Vision (Görsel) Modelleri - Rastgele seçilecek ücretsiz modeller
 export const visionModels = [
