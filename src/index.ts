@@ -9,30 +9,29 @@ import { startReminderService } from './services/reminders';
 
 dotenv.config();
 
-// Çevresel Değişken Kontrolü (Hata ayıklama için)
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
 
 if (!token || !supabaseUrl || !supabaseKey) {
   console.error("❌ HATA: Gerekli çevresel değişkenler (.env) eksik!");
-  if (!token) console.error("- TELEGRAM_BOT_TOKEN bulunamadı.");
-  if (!supabaseUrl) console.error("- SUPABASE_URL bulunamadı.");
-  if (!supabaseKey) console.error("- SUPABASE_SERVICE_KEY bulunamadı.");
   process.exit(1);
 }
 
-// --- EXPRESS SERVER ---
 const app = express();
 const port = process.env.PORT || 3000;
-app.get('/', (req, res) => res.send('Bot is running! 🚀'));
-app.listen(port, () => console.log(`Web server is listening on port ${port}`));
 
-const bot = new Telegraf(token);
+async function startServer() {
+  app.get('/', (req, res) => res.send('Bot is running! 🚀'));
+  app.listen(port, () => console.log(`[SERVER] Web server listening on port ${port}`));
+}
 
-// --- BOT INITIALIZATION ---
-initDatabase().then(async () => {
+async function initializeApp() {
   try {
+    await initDatabase();
+    console.log('✅ Veritabanı bağlantısı başarılı.');
+
+    const bot = new Telegraf(token!);
     setupBot(bot);
     startReminderService(bot);
 
@@ -48,17 +47,19 @@ initDatabase().then(async () => {
       { command: 'hatirlatici', description: '⏰ Hatırlatıcı Kur' },
       { command: 'pdf_baslat', description: '✍️ Adım Adım PDF Oluştur' },
     ]);
-    
-    bot.launch().then(() => console.log('Bot başarıyla başlatıldı! 🚀'));
+
+    await bot.launch();
+    console.log('🚀 Bot başarıyla başlatıldı!');
+
+    process.once('SIGINT', () => bot.stop('SIGINT'));
+    process.once('SIGTERM', () => bot.stop('SIGTERM'));
+
   } catch (error) {
-    console.error("❌ Bot başlatılırken kritik hata:", error);
+    console.error("❌ Uygulama başlatılırken kritik hata:", error);
     process.exit(1);
   }
-}).catch(err => {
-  console.error("❌ Veritabanı başlatılamadı:", err);
-  process.exit(1);
-});
+}
 
-process.once('SIGINT', () => bot.stop('SIGINT'));
-process.once('SIGTERM', () => bot.stop('SIGTERM'));
+startServer();
+initializeApp();
 
